@@ -12,8 +12,8 @@ const fileUpload = require('express-fileupload')
 env.config()
 //cors for fetching
 app.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true
+  origin: "http://localhost:5173",
+  credentials: true
 }))
 
 
@@ -32,6 +32,13 @@ app.use(express.json())
 
 app.use('/api', web)
 
+app.get('/', (req, res) => {
+  res.send({
+    activeStatus: true,
+    error: false,
+  })
+})
+
 app.listen(process.env.PORT, (req, res) => {
-    console.log(`server start localhost:${process.env.PORT}`)
+  console.log(`server start localhost:${process.env.PORT}`)
 })
