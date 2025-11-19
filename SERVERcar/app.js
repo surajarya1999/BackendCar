@@ -11,10 +11,23 @@ const fileUpload = require('express-fileupload')
 
 env.config()
 //cors for fetching
+// app.use(cors({
+//   origin: ["http://localhost:5173","https://full-stack-car-rental-one.vercel.app/"],
+//   credentials: true
+// }))
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
+
 app.use(cors({
-  origin: ["http://localhost:5173","https://full-stack-car-rental-one.vercel.app/"],
+  origin: [
+    "http://localhost:5173",
+    "https://full-stack-car-rental-one.vercel.app"
+  ],
   credentials: true
-}))
+}));
 
 
 app.use(fileUpload({
