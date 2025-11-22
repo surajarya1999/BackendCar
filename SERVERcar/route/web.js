@@ -9,6 +9,7 @@ const FeedbackController = require('../controller/FeedbackController');
 const ContactController = require('../controller/ContactController');
 const StatsController = require('../controller/admin/StatsController');
 const PaymentController = require('../controller/PaymentController');
+const upload = require("../config/multer");
 const route = express.Router()
 
 
@@ -38,10 +39,10 @@ route.put("/approve/:id", isAuthenticated, isAdmin, StaffController.approveStaff
 route.delete("/reject/:id", isAuthenticated, isAdmin, StaffController.rejectStaff);
 
 //// car Add /////
-route.post('/carinsert', CarController.carCreate)
+route.post("/carinsert", upload.single("image"), CarController.carCreate);
 route.get('/cardisplay', CarController.carDisplay)
 route.get('/carview/:id', CarController.carView)
-route.put('/carupdate/:id', CarController.carUpdate)
+route.put('/carupdate/:id', upload.single("image"), CarController.carUpdate)
 route.delete('/cardelete/:id', CarController.carDelete)
 //// car Add /////
 

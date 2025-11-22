@@ -5,16 +5,12 @@ const web = require('./route/web')
 const connectdb = require('./db/connectDB')
 const cors = require('cors')
 const env = require('dotenv')
-const fileUpload = require('express-fileupload')
+const upload = require("./config/multer");
+
 
 
 
 env.config()
-//cors for fetching
-// app.use(cors({
-//   origin: ["http://localhost:5173","https://full-stack-car-rental-one.vercel.app/"],
-//   credentials: true
-// }))
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
@@ -27,12 +23,6 @@ app.use(cors({
     "https://full-stack-car-rental-one.vercel.app"
   ],
   credentials: true
-}));
-
-
-app.use(fileUpload({
-  useTempFiles: true,
-  tempFileDir: "/tmp/",   // zaroori hai cloudinary ke liye
 }));
 
 
@@ -52,7 +42,4 @@ app.get('/', (req, res) => {
   })
 })
 
-// app.listen(process.env.PORT, (req, res) => {
-//   console.log(`server start localhost:${process.env.PORT}`)
-// })
 module.exports = app;

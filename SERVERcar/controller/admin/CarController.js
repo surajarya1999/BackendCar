@@ -1,55 +1,43 @@
 const CarModel = require('../../model/car');
-const cloudinary = require('cloudinary');
+const cloudinary = require("../../config/cloudinary");
 
-// Setup
-cloudinary.config({
-    cloud_name: 'djprilnpn',
-    api_key: '621695583687777',
-    api_secret: 'd4IoBJf2UUrdq9Ilc5aK41DiIr0'
-});
 
 
 class CarController {
 
     static carCreate = async (req, res) => {
         try {
-            // console.log(req.body)
-            const { name, model, color, fuelType, price } = req.body
-            if (!name || !model || !color || !fuelType || !price) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'All Fields are Require!'
-                })
+            if (!req.file) {
+                return res.status(400).json({ message: "Image is required" });
             }
-            const file = req.files.image
-            const imageUpload = await cloudinary.uploader.upload(
-                file.tempFilePath,
-                {
-                    folder: 'carRental_AddCar'
-                }
-            )
-            // console.log(imageUpload)
-            const car = await CarModel.create({
-                name,
-                model,
-                color,
-                fuelType,
-                price,
+
+            // Cloudinary upload result
+            const imageResult = req.file; // multer-storage-cloudinary returns file info
+
+            const car = new CarModel({
+                name: req.body.name,
+                model: req.body.model,
+                color: req.body.color,
+                fuelType: req.body.fuelType,
+                price: req.body.price,
                 image: {
-                    public_id: imageUpload.public_id,
-                    url: imageUpload.secure_url
+                    public_id: imageResult.filename,
+                    url: imageResult.path
                 }
-            })
-            return res.status(201).json({
-                success: true,
-                message: 'Car Added done!',
+            });
+
+            await car.save();
+
+            res.status(201).json({
+                message: "Car added successfully",
                 data: car
-            })
+            });
 
         } catch (error) {
-            console.log(error)
+            console.error(error);
+            res.status(500).json({ message: "Internal Server Error" });
         }
-    }
+    };
 
     static carDisplay = async (req, res) => {
         try {
@@ -92,46 +80,45 @@ class CarController {
 
     static carUpdate = async (req, res) => {
         try {
-            const id = req.params.id;
-            const { name, model, color, fuelType, price } = req.body;
+            const existingCar = await CarModel.findById(req.params.id);
 
-            // update object
-            const updateData = { name, model, color, fuelType, price };
+            if (!existingCar) {
+                return res.status(404).json({ message: "Car not found" });
+            }
 
-            if (req.files && req.files.image) {
-                const Admin = await CarModel.findById(id);
+            let updatedImage = existingCar.image;
 
-                if (Admin?.image?.public_id) {
-                    await cloudinary.uploader.destroy(Admin.image.public_id);
-                }
-
-                // नई image upload
-                const imagefile = req.files.image;
-                const imageupdate = await cloudinary.uploader.upload(
-                    imagefile.tempFilePath,
-                    { folder: "carRental_AddCar" } // same folder as in create
-                );
-
-                updateData.image = {
-                    public_id: imageupdate.public_id,
-                    url: imageupdate.secure_url,
+            if (req.file) {
+                updatedImage = {
+                    public_id: req.file.filename,
+                    url: req.file.path
                 };
             }
 
-            await CarModel.findByIdAndUpdate(id, updateData);
+            const updatedCar = await CarModel.findByIdAndUpdate(
+                req.params.id,
+                {
+                    name: req.body.name,
+                    model: req.body.model,
+                    color: req.body.color,
+                    fuelType: req.body.fuelType,
+                    price: req.body.price,
+                    image: updatedImage,
+                },
+                { new: true }
+            );
 
-            return res.status(201).json({
-                success: true,
-                message: "Car Updated successfully",
+            res.status(200).json({
+                message: "Car updated successfully",
+                data: updatedCar
             });
+
         } catch (error) {
             console.log(error);
-            return res.status(500).json({
-                success: false,
-                message: "Something went wrong!",
-            });
+            res.status(500).json({ message: "Internal Server Error" });
         }
     };
+
 
 
 
