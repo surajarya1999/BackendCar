@@ -7,7 +7,7 @@ class userController {
     static async register(req, res) {
         try {
             const { name, email, password, number, address, dob } = req.body;
-            
+
 
             const existingCustomer = await Customer.findOne({ email });
             if (existingCustomer) {
@@ -23,7 +23,7 @@ class userController {
                 number,
                 address,
                 dob,
-                
+
             });
 
             await newCustomer.save();
@@ -34,43 +34,49 @@ class userController {
     }
 
     // Login Customer
-    static async login(req, res) {
+    static login = async (req, res) => {
         try {
             const { email, password } = req.body;
 
-            const customer = await Customer.findOne({ email });
-            if (!customer) {
-                return res.status(400).json({ message: "Invalid credentials" });
+            // Check user exist
+            const user = await userModel.findOne({ email });
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
             }
 
-            const isMatch = await bcrypt.compare(password, customer.password);
+            // Match password
+            const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
-                return res.status(400).json({ message: "Invalid credentials" });
+                return res.status(401).json({ message: "Invalid credentials" });
             }
 
+            // Create token
             const token = jwt.sign(
-                { userId: customer._id, role: "customer" },
+                { userId: user._id, email: user.email },
                 process.env.JWT_SECRET,
                 { expiresIn: "7d" }
             );
 
+            // Send Cookie (THIS IS THE FIX)
             res.cookie("token", token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                secure: true,               // Netlify + Vercel required
+                sameSite: "none",           // Cross-site cookie → FIX
+                path: "/",                  // Cookie available to all routes
+                maxAge: 7 * 24 * 60 * 60 * 1000,
             });
 
             res.status(200).json({
-                message: "Customer login successful",
-                role: "customer",
-                name: customer.name,
-                email: customer.email
+                message: "Login successful",
+                user,
+                token,
             });
+
         } catch (error) {
+            console.log("Login Error:", error);
             res.status(500).json({ message: "Server error", error });
         }
-    }
+    };
 
     // 🚪 Logout Customer
     static async logout(req, res) {
