@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://splendid-pastelito-fce349.netlify.app"   // ← YOUR NETLIFY URL
+    "https://car-rental-with-suraj.netlify.app/"   // ← YOUR NETLIFY URL
   ],
   credentials: true
 }));
