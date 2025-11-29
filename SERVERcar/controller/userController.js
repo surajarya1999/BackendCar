@@ -90,7 +90,6 @@ class userController {
     }
 
 
-
     // Get Customer Profile
     static async getProfile(req, res) {
         try {
