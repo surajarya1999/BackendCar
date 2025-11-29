@@ -48,7 +48,7 @@ route.delete('/cardelete/:id', CarController.carDelete)
 
 // Booking Routes
 route.post('/bookinginsert',bookingController.createBooking)
-route.get('/userdisplay',bookingController.userBookedDisplay)
+route.get('/userdisplay',isAuthenticated,bookingController.userBookedDisplay)
 route.get('/bookingdisplay', bookingController.bookingDisplay)
 route.put("/bookings/:id/approve", bookingController.approveBooking);
 route.put("/bookings/:id/reject", bookingController.rejectBooking);

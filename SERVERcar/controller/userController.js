@@ -77,12 +77,18 @@ class userController {
     // 🚪 Logout Customer
     static async logout(req, res) {
         try {
-            res.clearCookie("token");
+            res.clearCookie("token", {
+                httpOnly: true,
+                secure: true,
+                sameSite: "none",
+                path: "/"
+            });
             res.status(200).json({ message: "Customer logged out successfully" });
         } catch (error) {
             res.status(500).json({ message: "Error during logout", error });
         }
     }
+
 
 
     // Get Customer Profile
