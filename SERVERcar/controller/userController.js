@@ -54,11 +54,12 @@ class userController {
                 { expiresIn: "7d" }
             );
 
+            // 🔥 MOST IMPORTANT COOKIE CONFIG
             res.cookie("token", token, {
                 httpOnly: true,
-                secure: true,
-                sameSite: "none",
-                path: "/",                        // VERY IMPORTANT
+                secure: true,         // HTTPS required on production
+                sameSite: "none",     // frontend <---> backend cookie allowed
+                path: "/",            // accessible everywhere
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
 
@@ -73,6 +74,8 @@ class userController {
             res.status(500).json({ message: "Server error", error });
         }
     }
+
+
 
     // 🚪 Logout Customer
     static async logout(req, res) {

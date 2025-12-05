@@ -47,6 +47,7 @@ class StaffController {
         try {
             const { staffId, email, password } = req.body;
 
+            // Staff find using staffId or email
             const staff = await Staff.findOne({
                 $or: [{ staffId }, { email }]
             });
@@ -55,6 +56,7 @@ class StaffController {
                 return res.status(400).json({ message: "Invalid credentials" });
             }
 
+            // Approval check
             if (!staff.isApproved) {
                 return res.status(403).json({ message: "Your account is not approved by admin yet" });
             }
@@ -70,11 +72,12 @@ class StaffController {
                 { expiresIn: "7d" }
             );
 
+            // 🔥 MOST IMPORTANT PART (LIVE PROJECT FIX)
             res.cookie("token", token, {
                 httpOnly: true,
-                secure: true,       // required on Netlify + Vercel
-                sameSite: "none",   // allow cross-site cookie
-                path: "/",          // required for refresh/logout
+                secure: true,           // always true on live domain (HTTPS)
+                sameSite: "none",       // allow frontend <-> backend cookie
+                path: "/",              // cookie available everywhere
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
 

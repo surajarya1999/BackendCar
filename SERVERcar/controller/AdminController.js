@@ -55,11 +55,12 @@ class AdminController {
                 { expiresIn: "7d" }
             );
 
+            // 🔥 Live project stable cookie
             res.cookie("token", token, {
                 httpOnly: true,
-                secure: true,          // because Netlify + Vercel = HTTPS
-                sameSite: "none",      // CROSS-SITE COOKIE ALLOWED
-                path: "/",             // IMPORTANT FOR REFRESH + LOGOUT
+                secure: true,        // must be TRUE on live (HTTPS)
+                sameSite: "none",    // cross-domain cookie allow
+                path: "/",           // cookie available on all routes
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
 
