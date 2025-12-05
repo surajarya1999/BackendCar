@@ -55,11 +55,11 @@ class AdminController {
                 { expiresIn: "7d" }
             );
 
-            // Send token in cookie
             res.cookie("token", token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
+                secure: true,          // because Netlify + Vercel = HTTPS
+                sameSite: "none",      // CROSS-SITE COOKIE ALLOWED
+                path: "/",             // IMPORTANT FOR REFRESH + LOGOUT
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
 
@@ -69,10 +69,12 @@ class AdminController {
                 name: admin.name,
                 email: admin.email
             });
+
         } catch (error) {
             res.status(500).json({ message: "Server error", error });
         }
     }
+
 
     // 🚪 Logout
     static async logout(req, res) {

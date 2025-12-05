@@ -47,7 +47,6 @@ class StaffController {
         try {
             const { staffId, email, password } = req.body;
 
-            // Staff ko find karo dono me se kisi ek field se
             const staff = await Staff.findOne({
                 $or: [{ staffId }, { email }]
             });
@@ -56,7 +55,6 @@ class StaffController {
                 return res.status(400).json({ message: "Invalid credentials" });
             }
 
-            // ✅ Approval check
             if (!staff.isApproved) {
                 return res.status(403).json({ message: "Your account is not approved by admin yet" });
             }
@@ -74,8 +72,9 @@ class StaffController {
 
             res.cookie("token", token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
+                secure: true,       // required on Netlify + Vercel
+                sameSite: "none",   // allow cross-site cookie
+                path: "/",          // required for refresh/logout
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
 
@@ -91,6 +90,7 @@ class StaffController {
             res.status(500).json({ message: "Server error", error });
         }
     }
+
 
     // 🚪 Logout
     static async logout(req, res) {
