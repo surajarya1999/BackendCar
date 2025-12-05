@@ -47,7 +47,7 @@ class StaffController {
         try {
             const { staffId, email, password } = req.body;
 
-            // Staff find using staffId or email
+            // Staff ko find karo dono me se kisi ek field se
             const staff = await Staff.findOne({
                 $or: [{ staffId }, { email }]
             });
@@ -56,7 +56,7 @@ class StaffController {
                 return res.status(400).json({ message: "Invalid credentials" });
             }
 
-            // Approval check
+            // ✅ Approval check
             if (!staff.isApproved) {
                 return res.status(403).json({ message: "Your account is not approved by admin yet" });
             }
@@ -72,12 +72,10 @@ class StaffController {
                 { expiresIn: "7d" }
             );
 
-            // 🔥 MOST IMPORTANT PART (LIVE PROJECT FIX)
             res.cookie("token", token, {
                 httpOnly: true,
-                secure: true,           // always true on live domain (HTTPS)
-                sameSite: "none",       // allow frontend <-> backend cookie
-                path: "/",              // cookie available everywhere
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
 
@@ -93,7 +91,6 @@ class StaffController {
             res.status(500).json({ message: "Server error", error });
         }
     }
-
 
     // 🚪 Logout
     static async logout(req, res) {
