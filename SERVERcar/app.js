@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const cookie = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 const web = require('./route/web')
 const connectdb = require('./db/connectDB')
 const cors = require('cors')
@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 //mogoose
 connectdb()
 //cookie
-app.use(cookie())
+app.use(cookieParser());
 
 app.use(express.json())
 
